@@ -225,7 +225,17 @@ allow_mode_change(struct Client *source_p, struct Channel *chptr, int alevel,
 		*errors |= SM_ERR_MLOCK;
 		return 0;
 	}
-	if(alevel != CHFL_CHANOP)
+
+        if( (chptr->mode.mode & MODE_OPERONLY) && !IsOper(source_p))
+        {
+                if(!(*errors & SM_ERR_NOPRIVS))
+                        sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, chptr->chname);
+                *errors |= SM_ERR_NOPRIVS;
+                return 0;
+
+        }
+
+	if(alevel != CHFL_CHANOP && c != 'o')
 	{
 		if(!(*errors & SM_ERR_NOOPS))
 			sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
@@ -233,6 +243,7 @@ allow_mode_change(struct Client *source_p, struct Channel *chptr, int alevel,
 		*errors |= SM_ERR_NOOPS;
 		return 0;
 	}
+
 	return 1;
 }
 
@@ -1498,7 +1509,7 @@ struct ChannelMode chmode_table[256] =
   {chm_nosuch,	0 },			/* U */
   {chm_nosuch,	0 },			/* V */
   {chm_nosuch,	0 },			/* W */
-  {chm_nosuch,	0 },			/* X */
+  {chm_simple,	MODE_OPERONLY },	/* X */
   {chm_nosuch,	0 },			/* Y */
   {chm_nosuch,	0 },			/* Z */
   {chm_nosuch,	0 },

@@ -177,11 +177,13 @@ mo_kline(struct Client *client_p, struct Client *source_p, int parc, const char 
 		return 0;
 	}
 
-	if(propagated && tkline_time == 0)
+	// malcom: propagated 0 sec klines
+
+/*	if(propagated && tkline_time == 0)
 	{
 		sendto_one_notice(source_p, ":Cannot set a permanent global ban");
 		return 0;
-	}
+	} */
 
 	if(already_placed_kline(source_p, user, host, tkline_time))
 		return 0;

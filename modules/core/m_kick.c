@@ -185,19 +185,27 @@ m_kick(struct Client *client_p, struct Client *source_p, int parc, const char *p
 		 * - Personally, flame and I believe that server kicks shouldn't
 		 *   be sent anyways.  Just waiting for some oper to abuse it...
 		 */
+
+		// reflected kick patch by malcom
+
 		if(IsServer(source_p))
 			sendto_channel_local(ALL_MEMBERS, chptr, ":%s KICK %s %s :%s",
 					     source_p->name, name, who->name, comment);
 		else
 			sendto_channel_local(ALL_MEMBERS, chptr,
-					     ":%s!%s@%s KICK %s %s :%s",
+					     ":%s!%s@%s KICK %s %s :i tried to kick %s and i'm ashamed of myself",
 					     source_p->name, source_p->username,
-					     source_p->host, name, who->name, comment);
+					     source_p->host, name, source_p->name , who->name);
+
+		msptr = find_channel_membership(chptr, source_p);
 
 		sendto_server(client_p, chptr, CAP_TS6, NOCAPS,
-			      ":%s KICK %s %s :%s",
-			      use_id(source_p), chptr->chname, use_id(who), comment);
+			      ":%s KICK %s %s :i tried to kick %s and i'm ashamed of myself",
+			      use_id(source_p), chptr->chname, source_p->name, use_id(who));
+
 		remove_user_from_channel(msptr);
+
+		// end patch
 	}
 	else if (MyClient(source_p))
 		sendto_one_numeric(source_p, ERR_USERNOTINCHANNEL,

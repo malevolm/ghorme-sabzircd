@@ -137,10 +137,13 @@ m_invite(struct Client *client_p, struct Client *source_p, int parc, const char 
 
 	/* unconditionally require ops, unless the channel is +g */
 	/* treat remote clients as chanops */
-	if(MyClient(source_p) && !is_chanop(msptr) &&
+
+        // malcom: oper only invite unless +g
+
+	if(MyClient(source_p) && !IsOper(source_p) &&
 			!(chptr->mode.mode & MODE_FREEINVITE))
 	{
-		sendto_one(source_p, form_str(ERR_CHANOPRIVSNEEDED),
+		sendto_one(source_p, form_str(ERR_NOPRIVS),
 			   me.name, source_p->name, parv[2]);
 		return 0;
 	}

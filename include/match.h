@@ -109,6 +109,11 @@ extern const unsigned int CharAttrs[];
 #define MWILD_C  0x8000
 #define LET_C   0x10000 /* an actual letter */
 #define FCHAN_C 0x20000 /* a 'fake' channel char */
+#define UCSMB_C 0x40000		/* UCS/UTF-8 encoded multibyte sequence char */
+#define MIRCATTR_C \
+		0x80000		/* mIRC attribute encoding char */
+#define NINITIAL_C \
+	       0x100000		/* Character that may not appear as the initial octet */
 
 #define IsHostChar(c)   (CharAttrs[(unsigned char)(c)] & HOST_C)
 #define IsUserChar(c)   (CharAttrs[(unsigned char)(c)] & USER_C)
