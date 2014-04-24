@@ -226,7 +226,7 @@ allow_mode_change(struct Client *source_p, struct Channel *chptr, int alevel,
 		return 0;
 	}
 
-        if( (chptr->mode.mode & MODE_OPERONLY) && !IsOper(source_p))
+        if( (chptr->mode.mode & MODE_OPERONLY) && !IsOper(source_p) && c != 'o' && c != 'v')
         {
                 if(!(*errors & SM_ERR_NOPRIVS))
                         sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, chptr->chname);
