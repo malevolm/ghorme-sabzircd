@@ -537,9 +537,9 @@ rb_linebuf_putmsg(buf_head_t * bufhead, const char *format, va_list * va_args,
 	bufline->terminated = 1;
 
 	/* Truncate the data if required */
-	if(rb_unlikely(len > 510))
+	if(rb_unlikely(len > (BUF_DATA_SIZE - 1)))
 	{
-		len = 510;
+		len = BUF_DATA_SIZE - 1;
 		bufline->buf[len++] = '\r';
 		bufline->buf[len++] = '\n';
 	}
