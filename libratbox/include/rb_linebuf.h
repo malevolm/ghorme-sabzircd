@@ -40,7 +40,7 @@ struct _buf_line;
 struct _buf_head;
 
 /* How big we want a buffer - 510 data bytes, plus space for a '\0' */
-#define BUF_DATA_SIZE		1488
+#define BUF_DATA_SIZE		2511
 
 typedef struct _buf_line
 {

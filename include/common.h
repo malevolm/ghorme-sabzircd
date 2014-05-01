@@ -63,7 +63,7 @@
 #define IRCD_MIN(a, b)  ((a) < (b) ? (a) : (b))
 
 /* Right out of the GANGNET AHAHA HACKED*/
-#define IRCD_BUFSIZE 1490
+#define IRCD_BUFSIZE 2512
 
 /* readbuf size */
 #define READBUF_SIZE 16384
