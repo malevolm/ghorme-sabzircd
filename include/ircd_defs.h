@@ -83,7 +83,7 @@
 
 /* 23+1 for \0 */
 #define KEYLEN          24
-#define BUFSIZE         2512	/* WARNING: *DONT* CHANGE THIS!!!! */
+#define BUFSIZE         1024	/* WARNING: *DONT* CHANGE THIS!!!! */
 #define OPERNICKLEN     (NICKLEN*2)	/* Length of OPERNICKs. */
 
 #define USERHOST_REPLYLEN       (NICKLEN+HOSTLEN+USERLEN+5)
