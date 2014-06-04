@@ -7,6 +7,10 @@
  * provided that the above copyright notice remains unchanged.
  *
  * m_chghost.c: A module for handling spoofing dynamically.
+ * 
+ * malcom: this was deemed TOO ABUSIVE and purposely crippled by jilles
+ *
+ *         Mein Führer! I can walk!
  */
 
 #include "stdinc.h"
@@ -45,7 +49,7 @@ struct Message chghost_msgtab = {
 
 mapi_clist_av1 chghost_clist[] = { &chghost_msgtab, &realhost_msgtab, NULL };
 
-DECLARE_MODULE_AV1(chghost, NULL, NULL, chghost_clist, NULL, NULL, "$Revision: 3424 $");
+DECLARE_MODULE_AV1(chghost, NULL, NULL, chghost_clist, NULL, NULL, "$Revision: 3440 $");
 
 /* clean_host()
  *
@@ -196,6 +200,7 @@ me_chghost(struct Client *client_p, struct Client *source_p,
  */
 /* Disable this because of the abuse potential -- jilles
  * No, make it toggleable via ./configure. --nenolod
+ * No, just fucking allow it. --malcom
  */
 static int
 mo_chghost(struct Client *client_p, struct Client *source_p,
