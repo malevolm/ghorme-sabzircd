@@ -26,7 +26,7 @@
  *  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: m_force.c 3300 2014-06-04 22:34:30Z crack $
+ * $Id: m_force.c 3297 2007-03-28 14:49:48Z jilles $
  */
 
 #include "stdinc.h"
@@ -66,7 +66,7 @@ struct Message forcepart_msgtab = {
 
 mapi_clist_av1 force_clist[] = { &forcejoin_msgtab, &forcepart_msgtab, NULL };
 
-DECLARE_MODULE_AV1(force, NULL, NULL, force_clist, NULL, NULL, "$Revision: 3300 $");
+DECLARE_MODULE_AV1(force, NULL, NULL, force_clist, NULL, NULL, "$Revision: 3297 $");
 
 /*
  * m_forcejoin
@@ -104,7 +104,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 	if(!IsPerson(target_p))
 		return 0;
 
-	sendto_realops_snomask(SNO_GENERAL, L_ALL,
+	sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
 			     "Forced JOIN for %s to %s by %s",
 			     parv[1], parv[2], get_oper_name(source_p));
 	ilog(L_MAIN, "Forced JOIN for %s to %s by %s",
@@ -250,7 +250,7 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 	if(!IsClient(target_p))
 		return 0;
 
-	sendto_realops_snomask(SNO_GENERAL, L_ALL,
+	sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
 			     "Forced PART for %s from %s by %s",
 			      parv[1], parv[2], get_oper_name(source_p));
 	ilog(L_MAIN, "Forced PART for %s from %s by %s",
