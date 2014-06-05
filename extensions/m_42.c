@@ -26,7 +26,7 @@
  *  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: m_force.c 3297 2007-03-28 14:49:48Z jilles $
+ * $Id: m_force.c 3300 2014-06-04 22:34:30Z crack $
  */
 
 #include "stdinc.h"
@@ -47,6 +47,7 @@
 #include "msg.h"
 #include "parse.h"
 #include "modules.h"
+#include "operhash.h"
 
 static int mo_forcejoin(struct Client *client_p, struct Client *source_p,
 			int parc, const char *parv[]);
@@ -65,7 +66,7 @@ struct Message forcepart_msgtab = {
 
 mapi_clist_av1 force_clist[] = { &forcejoin_msgtab, &forcepart_msgtab, NULL };
 
-DECLARE_MODULE_AV1(force, NULL, NULL, force_clist, NULL, NULL, "$Revision: 3297 $");
+DECLARE_MODULE_AV1(force, NULL, NULL, force_clist, NULL, NULL, "$Revision: 3300 $");
 
 /*
  * m_forcejoin
@@ -103,15 +104,12 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 	if(!IsPerson(target_p))
 		return 0;
 
-	sendto_wallops_flags(UMODE_WALLOP, &me,
-			     "FORCEJOIN called for %s %s by %s!%s@%s",
-			     parv[1], parv[2], source_p->name, source_p->username, source_p->host);
-	ilog(L_MAIN, "FORCEJOIN called for %s %s by %s!%s@%s",
-	     parv[1], parv[2], source_p->name, source_p->username, source_p->host);
-	sendto_server(NULL, NULL, NOCAPS, NOCAPS,
-			":%s WALLOPS :FORCEJOIN called for %s %s by %s!%s@%s",
-			me.name, parv[1], parv[2],
-			source_p->name, source_p->username, source_p->host);
+	sendto_realops_snomask(SNO_GENERAL, L_ALL,
+			     "Forced JOIN for %s to %s by %s",
+			     parv[1], parv[2], get_oper_name(source_p));
+	ilog(L_MAIN, "Forced JOIN for %s to %s by %s",
+	     parv[1], parv[2], get_oper_name(source_p));
+
 
 	/* select our modes from parv[2] if they exist... (chanop) */
 	if(*parv[2] == '@')
@@ -252,15 +250,11 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 	if(!IsClient(target_p))
 		return 0;
 
-	sendto_wallops_flags(UMODE_WALLOP, &me,
-			     "FORCEPART called for %s %s by %s!%s@%s",
-			     parv[1], parv[2], source_p->name, source_p->username, source_p->host);
-	ilog(L_MAIN, "FORCEPART called for %s %s by %s!%s@%s",
-	     parv[1], parv[2], source_p->name, source_p->username, source_p->host);
-	sendto_server(NULL, NULL, NOCAPS, NOCAPS,
-			":%s WALLOPS :FORCEPART called for %s %s by %s!%s@%s",
-			me.name, parv[1], parv[2],
-			source_p->name, source_p->username, source_p->host);
+	sendto_realops_snomask(SNO_GENERAL, L_ALL,
+			     "Forced PART for %s from %s by %s",
+			      parv[1], parv[2], get_oper_name(source_p));
+	ilog(L_MAIN, "Forced PART for %s from %s by %s",
+	      parv[1], parv[2], get_oper_name(source_p));
 
 	if((chptr = find_channel(parv[2])) == NULL)
 	{
