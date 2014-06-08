@@ -1,0 +1,5 @@
+CHGHOST <nick> <new host>
+
+-- Forces a users host to change
+
+Requires oper priv: oper:change_host

@@ -163,8 +163,13 @@ extern void cluster_generic(struct Client *, const char *, int cltype,
 #define IsOperOperwall(x)       (HasPrivilege((x), "oper:operwall"))
 #define IsOperSpy(x)            (HasPrivilege((x), "oper:spy"))
 #define IsOperInvis(x)          (HasPrivilege((x), "oper:hidden"))
-#define IsOperRemoteBan(x)	(HasPrivilege((x), "oper:remoteban"))
-#define IsOperMassNotice(x)	(HasPrivilege((x), "oper:mass_notice"))
+#define IsOperRemoteBan(x)		(HasPrivilege((x), "oper:remoteban"))
+#define IsOperMassNotice(x)		(HasPrivilege((x), "oper:mass_notice"))
+
+// Additional privileges by capacit0r
+#define IsOperForce(x) 			(HasPrivilege((x), "oper:force"))
+#define IsOperForceNick(x) 		(HasPrivilege((x), "oper:force_nick"))
+#define IsOperChghost(x)		(HasPrivilege((x), "oper:change_host"))
 
 extern struct oper_conf *make_oper_conf(void);
 extern void free_oper_conf(struct oper_conf *);

@@ -208,10 +208,11 @@ mo_chghost(struct Client *client_p, struct Client *source_p,
 {
 	struct Client *target_p;
 
-	if(!IsOperAdmin(source_p))
+// Adding config flag for CHGHOST --capacit0r
+	if(!IsOperChghost(source_p))
 	{
 		sendto_one(source_p, form_str(ERR_NOPRIVS),
-			   me.name, source_p->name, "admin");
+			   me.name, source_p->name, "change_host");
 		return 0;
 	}
 

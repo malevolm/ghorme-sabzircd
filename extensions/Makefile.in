@@ -64,7 +64,9 @@ SRCS =                          \
   sno_globalkline.c		\
   sno_globaloper.c		\
   sno_whois.c			\
-  m_force.c			\
+  m_force.c				\
+  m_skill.c				\
+  m_forcenick.c			\
   m_adminwall.c			\
   m_findforwards.c		\
   m_identify.c			\

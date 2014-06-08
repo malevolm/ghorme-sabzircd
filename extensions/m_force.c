@@ -28,6 +28,8 @@
  *
  * $Id: m_force.c 3297 2007-03-28 14:49:48Z jilles $
  */
+ 
+ // Modified by capacit0r
 
 #include "stdinc.h"
 #include "channel.h"
@@ -47,7 +49,6 @@
 #include "msg.h"
 #include "parse.h"
 #include "modules.h"
-#include "operhash.h"
 
 static int mo_forcejoin(struct Client *client_p, struct Client *source_p,
 			int parc, const char *parv[]);
@@ -66,7 +67,7 @@ struct Message forcepart_msgtab = {
 
 mapi_clist_av1 force_clist[] = { &forcejoin_msgtab, &forcepart_msgtab, NULL };
 
-DECLARE_MODULE_AV1(force, NULL, NULL, force_clist, NULL, NULL, "$Revision: 3297 $");
+DECLARE_MODULE_AV1(force, NULL, NULL, force_clist, NULL, NULL, "capacit0r edit 0.1");
 
 /*
  * m_forcejoin
@@ -83,18 +84,16 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 	char sjmode;
 	char *newch;
 
-	if(!IsOperAdmin(source_p))
+	// Additional oper privilege flag
+	if(!IsOperForce(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "force");
 		return 0;
 	}
 
 	if((hunt_server(client_p, source_p, ":%s FORCEJOIN %s %s", 1, parc, parv)) != HUNTED_ISME)
 		return 0;
 
-	/* if target_p is not existant, print message
-	 * to source_p and bail - scuzzy
-	 */
 	if((target_p = find_client(parv[1])) == NULL)
 	{
 		sendto_one(source_p, form_str(ERR_NOSUCHNICK), me.name, source_p->name, parv[1]);
@@ -109,7 +108,6 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 			     parv[1], parv[2], get_oper_name(source_p));
 	ilog(L_MAIN, "Forced JOIN for %s to %s by %s",
 	     parv[1], parv[2], get_oper_name(source_p));
-
 
 	/* select our modes from parv[2] if they exist... (chanop) */
 	if(*parv[2] == '@')
@@ -218,7 +216,7 @@ mo_forcejoin(struct Client *client_p, struct Client *source_p, int parc, const c
 		 * seen from the server handling the command instead of the server that
 		 * the oper is on.
 		 */
-		sendto_one_notice(source_p, ":*** Notice -- Creating channel %s", chptr->chname);
+		sendto_realops_snomask(SNO_GENERAL, L_NETWIDE, "Creating channel %s", chptr->chname);
 	}
 	return 0;
 }
@@ -231,9 +229,10 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 	struct Channel *chptr;
 	struct membership *msptr;
 
-	if(!IsOperAdmin(source_p))
+	// Additional oper privilege flag
+	if(!IsOperForce(source_p))
 	{
-		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "admin");
+		sendto_one(source_p, form_str(ERR_NOPRIVS), me.name, source_p->name, "force");
 		return 0;
 	}
 
@@ -252,9 +251,9 @@ mo_forcepart(struct Client *client_p, struct Client *source_p, int parc, const c
 
 	sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
 			     "Forced PART for %s from %s by %s",
-			      parv[1], parv[2], get_oper_name(source_p));
+			     parv[1], parv[2], get_oper_name(source_p));
 	ilog(L_MAIN, "Forced PART for %s from %s by %s",
-	      parv[1], parv[2], get_oper_name(source_p));
+	     parv[1], parv[2], get_oper_name(source_p));
 
 	if((chptr = find_channel(parv[2])) == NULL)
 	{
