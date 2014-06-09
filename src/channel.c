@@ -55,6 +55,8 @@ static void free_topic(struct Channel *chptr);
 
 static int h_can_join;
 static int h_can_send;
+int h_channel_join;
+int h_channel_part;
 int h_get_channel_access;
 
 /* init_channels()
@@ -74,6 +76,8 @@ init_channels(void)
 	h_can_join = register_hook("can_join");
 	h_can_send = register_hook("can_send");
 	h_get_channel_access = register_hook("get_channel_access");
+	h_channel_join = register_hook("channel_join");
+	h_channel_part = register_hook("channel_part");
 }
 
 /*
@@ -95,6 +99,8 @@ free_channel(struct Channel *chptr)
 	rb_free(chptr->mode_lock);
 	rb_bh_free(channel_heap, chptr);
 }
+
+
 
 struct Ban *
 allocate_ban(const char *banstr, const char *who, const char *forward)
@@ -1194,6 +1200,127 @@ channel_modes(struct Channel *chptr, struct Client *client_p)
 	rb_strlcat(final, buf2, sizeof final);
 	return final;
 }
+
+struct Channel *
+check_forward(struct Client *source_p, struct Channel *chptr, char *key, int *err)
+{
+	int depth = 0, i;
+	char *next = NULL;
+
+	/* The caller is only interested in the reason
+	 * for the original channel.
+	 */
+	if ((*err = can_join(source_p, chptr, key, &next)) == 0)
+		return chptr;
+
+	/* Forwarding is disabled */
+	if(!ConfigChannel.use_forward)
+		return NULL;
+
+	/* User is +Q */
+	if(IsNoForward(source_p))
+		return NULL;
+
+	while(depth < 16)
+	{
+		chptr = find_channel(next);
+		/* Can only forward to existing channels */
+		if(chptr == NULL)
+			return NULL;
+		/* Already on there, show original error message */
+		if(IsMember(source_p, chptr))
+			return NULL;
+		/* Juped. Sending a warning notice would be unfair */
+		if(hash_find_resv(chptr->chname))
+			return NULL;
+		/* Don't forward to +Q channel */
+		if(chptr->mode.mode & MODE_DISFORWARD)
+			return NULL;
+		i = can_join(source_p, chptr, key, &next);
+		if(i == 0)
+			return chptr;
+		if (next == NULL)
+			return NULL;
+		depth++;
+	}
+
+	return NULL;
+}
+
+/*
+ * do_join_0
+ *
+ * inputs	- pointer to client doing join 0
+ * output	- NONE
+ * side effects	- Use has decided to join 0. This is legacy
+ *		  from the days when channels were numbers not names. *sigh*
+ */
+void
+do_join_0(struct Client *client_p, struct Client *source_p)
+{
+	struct membership *msptr;
+	struct Channel *chptr = NULL;
+	rb_dlink_node *ptr;
+
+	/* Finish the flood grace period... */
+	if(MyClient(source_p) && !IsFloodDone(source_p))
+		flood_endgrace(source_p);
+
+	sendto_server(client_p, NULL, CAP_TS6, NOCAPS, ":%s JOIN 0", use_id(source_p));
+
+	while((ptr = source_p->user->channel.head))
+	{
+		if(source_p->user->channel.head && MyConnect(source_p) &&
+		   !IsOper(source_p) && !IsExemptSpambot(source_p))
+		{
+			check_spambot_warning(source_p, NULL);
+		}
+
+		msptr = ptr->data;
+		chptr = msptr->chptr;
+		sendto_channel_local(ALL_MEMBERS, chptr, ":%s!%s@%s PART %s", source_p->name,
+				     source_p->username, source_p->host, chptr->chname);
+		remove_user_from_channel(msptr);
+	}
+}
+
+int
+check_channel_name_loc(struct Client *source_p, const char *name)
+{
+	const char *p;
+
+	s_assert(name != NULL);
+	if(EmptyString(name))
+		return 0;
+
+	if(ConfigFileEntry.disable_fake_channels && !IsOper(source_p))
+	{
+		for(p = name; *p; ++p)
+		{
+			if(!IsChanChar(*p) || IsFakeChanChar(*p))
+				return 0;
+		}
+	}
+	else
+	{
+		for(p = name; *p; ++p)
+		{
+			if(!IsChanChar(*p))
+				return 0;
+		}
+	}
+
+	if(ConfigChannel.only_ascii_channels)
+	{
+		for(p = name; *p; ++p)
+			if(*p < 33 || *p > 126)
+				return 0;
+	}
+
+
+	return 1;
+}
+
 
 /* void send_cap_mode_changes(struct Client *client_p,
  *                        struct Client *source_p,
