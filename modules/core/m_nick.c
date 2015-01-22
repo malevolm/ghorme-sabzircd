@@ -21,7 +21,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
  *
- *  $Id: m_nick.c 3518 2007-06-22 21:59:09Z jilles $
+ *  $Id: m_nick.c 3600 2015-01-21 23:14:00Z malcom $
  */
 
 #include "stdinc.h"
@@ -537,7 +537,7 @@ clean_nick(const char *nick, int loc_client)
 	int len = 0;
 
 	/* nicks cant start with a digit or -, and must have a length */
-	if(*nick == '-' || *nick == '\0')
+	if(*nick == '-' || *nick == '\0' || *nick == '#')
 		return 0;
 
 	if(loc_client && IsDigit(*nick))
