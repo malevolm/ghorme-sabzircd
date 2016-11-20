@@ -880,7 +880,7 @@ flood_attack_channel(int p_or_n, struct Client *source_p, struct Channel *chptr,
 {
 	int delta;
 
-	if(GlobalSetOptions.floodcount && MyClient(source_p))
+	if(!IsExemptFlood(source_p) && GlobalSetOptions.floodcount && MyClient(source_p))
 	{
 		if((chptr->first_received_message_time + 1) < rb_current_time())
 		{
