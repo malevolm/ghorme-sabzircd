@@ -23,7 +23,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#define BUFSIZE 512
+#define BUFSIZE 2048
 
 static void ConvertConf(FILE* file,FILE *outkline, FILE *outdline);
 static void usage(void);

@@ -33,7 +33,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#define BUFSIZE 512
+#define BUFSIZE 2048
 
 #define FLAGS_RESTRICTED	0x001
 #define FLAGS_EXCEEDLIMIT	0x002
